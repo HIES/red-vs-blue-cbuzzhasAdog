@@ -4,7 +4,7 @@ import java.util.Scanner;
 
 public class EmptyMap {
     public static void main(String[] args) throws FileNotFoundException {
-        int scale = 1024;
+        int scale = 2560;
         File f = new File("./input/" + args[0] + ".txt");
         Scanner s = new Scanner(f);
         // get dimensions
@@ -22,11 +22,9 @@ public class EmptyMap {
         StdDraw.setPenRadius(0.002);
         StdDraw.enableDoubleBuffering();
         s.reset();
-        s.nextLine();
-        s.nextLine();
-        s.nextLine();
-        s.nextLine();
-        s.nextLine();
+        for (int i = 0; i <5 ; i++) {
+            s.nextLine();
+        }
 
         boolean flag = false;
         while (s.hasNextLine()) {
