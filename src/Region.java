@@ -1,7 +1,9 @@
+import java.awt.Color;
+
 public class Region {
     private String name;
     private int[] results;
-    private String color;
+    private Color color;
 
     public Region(int[] userResults, String rName){
         name = rName;
