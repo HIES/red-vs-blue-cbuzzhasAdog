@@ -10,6 +10,7 @@ public class BlendedAmerica {
     private static ArrayList<String> subRegions;
     private static HashMap<String, HashMap<String, Region>> regionsMap = new HashMap<>();// creates hash map
 
+
     public static void getGeoData(String fileName) throws FileNotFoundException {
         File f2 = new File("./input/" + fileName + ".txt");
         Scanner g = new Scanner(f2);
@@ -20,8 +21,14 @@ public class BlendedAmerica {
         while (g.hasNextLine()) {
             String subr = g.nextLine().toUpperCase();
             String reg = g.nextLine().toUpperCase();
-            System.out.print(reg);
-            System.out.println("   " + subr);
+
+            if (subr.contains(" PARISH"))
+                subr = subr.substring(0, subr.indexOf(" PARISH"));
+            if (subr.contains(" CITY")/*&& !reg.equals("NV")&& !reg.equals("VA")*/)
+                subr = subr.substring(0, subr.indexOf(" CITY"));
+
+            //System.out.print(reg);
+            //System.out.println("   " + subr);
 
             int size = g.nextInt();
             double[] xVals = new double[size];
@@ -36,15 +43,15 @@ public class BlendedAmerica {
             if (!regionsMap.containsKey(reg)) {
                 regionsMap.put(reg, new HashMap<String, Region>());
                 regionsMap.get(reg).put(subr, new Region(subr));
-                regionsMap.get(reg).get(subr).addxyVals(xVals,yVals);
+                regionsMap.get(reg).get(subr).addxyVals(xVals, yVals);
                 regions.add(reg);
-            } else if (regionsMap.containsKey(reg) && !regionsMap.get(reg).containsKey(subr)){
+            } else if (regionsMap.containsKey(reg) && !regionsMap.get(reg).containsKey(subr)) {
 
                 regionsMap.get(reg).put(subr, new Region(subr));
-                regionsMap.get(reg).get(subr).addxyVals(xVals,yVals);
+                regionsMap.get(reg).get(subr).addxyVals(xVals, yVals);
 
-            } else if (regionsMap.containsKey(reg) && regionsMap.get(reg).containsKey(subr)){
-                regionsMap.get(reg).get(subr).addxyVals(xVals,yVals);
+            } else if (regionsMap.containsKey(reg) && regionsMap.get(reg).containsKey(subr)) {
+                regionsMap.get(reg).get(subr).addxyVals(xVals, yVals);
             }
             if (g.hasNextLine()) {
                 g.nextLine();
@@ -53,13 +60,23 @@ public class BlendedAmerica {
         }
         g.close();
         System.out.println("Done");
+
     }
 
     public static void getVoteData(int electYear) throws FileNotFoundException {
         for (String r : regions) {
             File f = new File("./input/" + r + electYear + ".txt");
             Scanner s = new Scanner(f);
-            s.nextLine();
+            String[] regCanidates = s.nextLine().split(",");
+
+            canidates = new String[regCanidates.length - 1];
+
+            for (int i = 1; i < regCanidates.length; i++) {  //gets regions and candidates
+                //System.out.print(regCanidates[i] + " ");
+                canidates[i - 1] = regCanidates[i];
+
+            }
+            //System.out.print("\n");//formatting
 
             while (s.hasNextLine()) {
                 String[] line = s.nextLine().split(","); // grabs line of data
@@ -68,17 +85,24 @@ public class BlendedAmerica {
                 for (int i = 1; i < line.length; i++) {
                     votes[i - 1] = Integer.parseInt(line[i]); //fills votecount into votes
                 }
-                if (regionsMap.get(r).get(line[0].toUpperCase()) != null) {
-                    regionsMap.get(r).get(line[0].toUpperCase()).setVotes(votes);
-                    System.out.println(regionsMap.get(r).get(line[0].toUpperCase()).toString());
-                    //}
+                String subr = line[0].toUpperCase();
+                if (subr.contains(" PARISH"))
+                    subr = subr.substring(0, subr.indexOf(" PARISH"));
+                if (subr.contains(" CITY"))
+                    subr = subr.substring(0, subr.indexOf(" CITY"));
+
+                if (regionsMap.get(r).get(subr) != null) {
+                    regionsMap.get(r).get(subr).setVotes(votes);
+                    //System.out.println(regionsMap.get(r).get(subr).toString());
+
                 }
+
             }
         }
     }
 
     public static void visualize(String userFile) throws FileNotFoundException {
-        int scale = 2560;
+        int scale = 1400;
         File f2 = new File("./input/" + userFile + ".txt");
         Scanner j = new Scanner(f2);
         // get dimensions
@@ -104,30 +128,31 @@ public class BlendedAmerica {
                 xvals = regionsMap.get(superReg).get(value.getName()).getXVals();
                 yvals = regionsMap.get(superReg).get(value.getName()).getYVals();
 
+                //System.out.println(superReg+ "  " + value.getName());
                 for (int z = 0; z < xvals.size(); z++) {
-                    if (regionsMap.get(superReg).get(value.getName()).getColor().equals("RED"))
-                        StdDraw.setPenColor(StdDraw.RED);
-                    else if (regionsMap.get(superReg).get(value.getName()).getColor().equals("BLUE"))
-                        StdDraw.setPenColor(StdDraw.BLUE);
-                    else if (regionsMap.get(superReg).get(value.getName()).getColor().equals("GREY"))
-                        StdDraw.setPenColor(StdDraw.GRAY);
-                    else if (regionsMap.get(superReg).get(value.getName()).getColor().equals("WHITE"))
-                        StdDraw.setPenColor(StdDraw.WHITE);
-                    StdDraw.setPenColor(regionsMap.get(superReg).get(value.getName()).getR(),0,regionsMap.get(superReg).get(value.getName()).getB()+regionsMap.get(superReg).get(value.getName()).getIndependant());
+                    if (!regionsMap.get(superReg).containsKey(value.getName()) ||
+                            regionsMap.get(superReg).get(value.getName()).getColor().equals("nope")) {
+                        break;
+                    } else {
+                        StdDraw.setPenColor(regionsMap.get(superReg).get(value.getName()).getR(), 0, regionsMap.get(superReg).get(value.getName()).getB() + regionsMap.get(superReg).get(value.getName()).getIndependant());
+                        StdDraw.filledPolygon(xvals.get(z), yvals.get(z));
+                        StdDraw.setPenColor(StdDraw.BLACK);
+                        StdDraw.polygon(xvals.get(z), yvals.get(z));
 
-                    StdDraw.filledPolygon(xvals.get(z), yvals.get(z));
-                    StdDraw.setPenColor(StdDraw.BLACK);
-                    StdDraw.polygon(xvals.get(z), yvals.get(z));
+                    }
+
+                    //System.out.println(superReg+ "  " + value.getName());
                 }
-                System.out.println(value.getName());
             }
+            StdDraw.show();
         }
-        StdDraw.show();
     }
 
+
     public static void main(String[] args) throws FileNotFoundException {
-        getGeoData("USA");
-        getVoteData(2012);
-        visualize("USA");
+        getGeoData("USA-county");
+        getVoteData(1964);
+        visualize("USA-county");
+
     }
 }
