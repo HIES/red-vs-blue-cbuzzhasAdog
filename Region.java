@@ -1,6 +1,4 @@
 import java.util.ArrayList;
-import java.awt.Color;
-import java.util.HashMap;
 
 public class Region {
     private String name;
@@ -19,46 +17,61 @@ public class Region {
         name = rName;
         results = userResults;
         color = getWinner();
-        red = (int)((results[0]*1.0/(this.results[0]+this.results[1]+this.results[2])*1.0)*255);
-        independant = (int)((this.results[2]*1.0/(this.results[0]+this.results[1]+this.results[2])*1.0)*255);
-        blue = (int)((this.results[1]*1.0/(this.results[0]+this.results[1]+this.results[2])*1.0)*255);
+        red = (int) ((results[0] * 1.0 / (this.results[0] + this.results[1] + this.results[2]) * 1.0) * 255);
+        independant = (int) ((this.results[2] * 1.0 / (this.results[0] + this.results[1] + this.results[2]) * 1.0) * 255);
+        blue = (int) ((this.results[1] * 1.0 / (this.results[0] + this.results[1] + this.results[2]) * 1.0) * 255);
     }
-    public Region(String rName){
+
+    public Region(String rName) {
         name = rName;
+        color = getWinner();
     }
 
     public String getWinner() {
-        if (results[0] > results[1] && results[0] > results[2])
-            return "RED";
-        else if (results[1] > results[0] && results[1] > results[2])
-            return "BLUE";
-        else if (results[2] > results[0] && results[2] > results[1])
-            return "GREY";
-        else
-            return "WHITE";
+        if (results == null)
+            return "nope";
+        else {
+            if (results[0] > results[1] && results[0] > results[2])
+                return "RED";
+            else if (results[1] > results[0] && results[1] > results[2])
+                return "BLUE";
+            else if (results[2] > results[0] && results[2] > results[1])
+                return "GREY";
+            else
+                return "WHITE";
+        }
     }
+
+    public String getName() {
+        return name.toUpperCase();
+    }
+
     public int getR() {
 
-        return  red;
+        return red;
     }
+
     public int getIndependant() {
 
-        return  independant;
+        return independant;
     }
+
     public int getB() {
 
-        return  blue;
+        return blue;
     }
-    public void setVotes(int[] votes){
+
+    public void setVotes(int[] votes) {
         results = votes;
         color = getWinner();
-        red = (int)((results[0]*1.0/(this.results[0]+this.results[1]+this.results[2])*1.0)*255);
-        independant = (int)((this.results[2]*1.0/(this.results[0]+this.results[1]+this.results[2])*1.0)*255);
-        blue = (int)((this.results[1]*1.0/(this.results[0]+this.results[1]+this.results[2])*1.0)*255);
+        red = (int) ((results[0] * 1.0 / (this.results[0] + this.results[1] + this.results[2]) * 1.0) * 255);
+        independant = (int) ((this.results[2] * 1.0 / (this.results[0] + this.results[1] + this.results[2]) * 1.0) * 255);
+        blue = (int) ((this.results[1] * 1.0 / (this.results[0] + this.results[1] + this.results[2]) * 1.0) * 255);
     }
 
 
     public String getColor() {
+        getWinner();
         return color;
     }
 
@@ -66,6 +79,18 @@ public class Region {
 
         xVals.add(x);
         yVals.add(y);
+    }
+
+    public ArrayList<double[]> getXVals() {
+
+        return xVals;
+
+    }
+
+    public ArrayList<double[]> getYVals() {
+
+        return yVals;
+
     }
 
     @Override
